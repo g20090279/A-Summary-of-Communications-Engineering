@@ -64,3 +64,74 @@ For example, if a channel modeled as having a linear envelope delay characterist
 
 $$C(f)=e^{-2\pi f^2T},\qquad |f|<W.$$
 
+A signle with shape of `sinc` function will be distorted after going through this channel.
+
+---
+
+### A Simulation based on `Matlab`
+
+Create an input signal by `sinc` function.
+
+```matlab
+% symbol rate
+T = 1;
+
+% sampling rate
+fs = 20;
+
+% time span
+tSpan = 10;
+t = -tSpan*T : 1/fs : tSpan*T;
+
+% transmit signal
+x = sinc(t);
+figure;
+plot(t,x);
+xlabel('time (T)')
+ylabel('amplitude')
+title('time domain x(t)=sinc(t)')
+```
+
+Since the channel is complex, we have to form also complex signal. Otherwise, it is meaningless. But we analyze only the real part. Note that the complex signal represents the quadrature and in-phase paths.
+
+```matlab
+% Create baseband complex signal
+xBaseband = (1+1i)*x;
+```
+
+The freqeuncy-domain of input signal will be
+
+```matlab
+N = 1024;
+X = fft(xBaseband,N);
+X_shift = fftshift(X);
+f = ((0:N-1)-N/2)*fs/N;
+figure;
+plot(f,1/fs*abs(X_shift));
+xlim([-T,T])
+xlabel('frequency (1/T)');
+ylabel('amplitude')
+title('frequency domain X(f)')
+```
+
+The channel is characterized as linear evelope delay, which is quadratic in phase
+
+```matlab
+% channel freqeuncy response
+C = exp(-1i*2*pi*f.^2*T);
+```
+
+The frequency-domain of received signal is the multiplication of input signal and channel in frequency domain. The time-domain received signal is the `IFFT` (inverse discrete/fast Fourier Transform) of the frequency-domain received signal.
+
+```matlab
+Y = X.*C;
+y = ifft(Y);
+figure;
+plot(t,real(ifftshift(y)))
+```
+
+---
+
+Note that we can also get the time-domain received signal by calculating convolution of input signal and channel in time-domain. This gives the same results.
+
+We can see that final time-domain received signal is a bit different than expected due to the `DFT` and `IDFT` operations, we can see that the true output signal is distorted, i.e. different from the input signal. For the original input signal, the samples on $nT$ are zeros, resulting in no ISI. However, with distortion, the output signal has no longer the same characteristic, introducing ISI.
