@@ -36,11 +36,54 @@ Okay, we now understand the relation between the time domain and frequency domai
 >
 > The basic designing factor is the subcarrier spacing $\Delta f$.
 
+## Why designed the frequency spacing to be 15 kHz?
 
+The reasons come from multiple aspects. First of all, the freqeuncy spacing defines the bandwidth of each subcarrier, which should be narrow enough to have a flat channel frequency channel response. According to the LTE channel measurement, 15 kHz frequency span can be seen as narrow-band.
+
+The clock frequency in 4G is designed from that in 3G. Note that the chip rate in 3G is 3.84 Mchips/s. The supported maximum bandwidth in 3G is 5 MHz. LTE support 20 MHz bandwidth. There are $20$ MHz / $15$ kHz $\approx1333$ subcarriers. IFFT/FFT needs a power of 2 to have efficient calculation. The IFFT size for 20 MHz is therefore up to the next value that is power of 2, which is $N_{fft}=2048$. The sampling freqeuncy is then $f_{s}=\frac{1}{T_{sym}/N_{fft}}=\frac{}N_{fft}{T_{sym}}=2048*15000=30.72$ MHz, which is **8 times as much as the chip rate** in 3G.
+
+| Transmission BW | 1.25 MHz | 2.5 MHz |  5 MHz  |  10 MHz  |  15 MHz  |   20 MHz   |
+|:---------------:|:--------:|:-------:|:-------:|:--------:|:--------:|:--------:|
+|Sampling freqeuncy (MHz)| 192 (1/2*3.84) | 3.84 | 7.68 (2*3.84) | 15.36 (4*3.84) | 23.04 (6*3.84) | 30.72 (8*3.84) |
+| FFT size | 128| 256 | 512 | 1024 | 1536 | 2048 |
+
+(Table: Downlink OFDM sampling freqeuncy)
+
+We can see from the table that the sampling frequencies for different bandwidth are all multiples of 3.84 MChips/s. This indicates that 4G is back-compatible with 3G.
+
+>This is a benefit for the current vendors, since they don't need to replace much of the currently deployed equipment.
+
+From above the design is originated to the LTE system supporting max. 20 MHz. For this case, the highest sampling frequency is consequently 30.72 MHz. In 3GPP TS 36.211 Chapter 4, a *basic time unit* is defined as
+
+$$T_{s}=\frac{1}{15000\times2048}\approx3.2552\cdot10^{-8} s.$$
+
+A frame in LTE is 10 ms, which equals $T_{frame}=307200\cdot T_s$, and one slot duration is $T_{slot}=15360\cdot T_{s}=0.5\mathrm{\ ms}$ (the extra time is for practical raised cosine pulse shaping filter).
+
+The design of subcarrier spacing determines the symbol duration. The symbol duration $T_{sym}$ should be not smaller than the inverse of subcarrier spacing, i.e. $1/15000\approx66.7\mathrm{\ \mu s}$. This justifies 7 symbols in one slot with 0.5 ms.
+
+The basic time unit is **fixed** in the system. Later, some extensions to the standard make **variable** subcarrier spacing available, such as 7.5 kHz.
+
+## Subcarrier Spacing in 5G (NR)
+
+According to the Section 4.2 in [3GPP TS38.211 v16.2.0](#3GPP-TS38.211), the supported subcarrier spacing is 15 kHz, 30 kHz, 60 kHz, 120 kHz, 240 kHz.
+
+Taking $\Delta f=120\mathrm{\ kHz}$ as an example. The symbol duration in this case according to the specification is $T_{sym}=T_{slot}/14=0.125/14\mathrm{\ ms}\approx8.9286\mathrm{\ \mu s}$, where 14 symbols are in one time slot.
+
+Let's examine the time and frequency relation first,
+
+$$T_{sym}\approx8.9286\mathrm{\ \mu s}>\frac{1}{\Delta f}=\frac{1}{120000}\approx8.3333\mathrm{\ \mu s}.$$
+
+> Great, narrow-band Nquist ISI criterion fulfilled!
+
+
+
+---
 
 ## References:
 
-<a name="3GPP-TS36.211"></a>3GPP TS 36.211, (2020). 3rd Generation Partnership Project; Technical Specification Group Radio Access Network; Evolved Universal Terrestrial Radio Access (E-UTRA); Physical channels and modulation (Release 16), v16.2.0.
+<a name="3GPP-TS36.211"></a>3GPP TS 36.211, (06.2020). 3rd Generation Partnership Project; Technical Specification Group Radio Access Network; Evolved Universal Terrestrial Radio Access (E-UTRA); Physical channels and modulation (Release 16), v16.2.0.
+
+<a name="3GPP-TS38.211"></a>3GPP TS 38.211, (06.2020). 3rd Generation Partnership Project; Technical Specification Group Radio Access Network; NR; Physical channels and modulation (Release 16), v16.2.0.
 
 <a name="proakis-2018"></a>Proakis J. G., and Salehi M., (2008). Digital Communications, 5th Edition. McGraw-Hill.
 
