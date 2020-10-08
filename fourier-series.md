@@ -14,7 +14,7 @@ We call $a_n$ Fourier cosine coefficient and $b_n$ Fourier sine coefficient. Bot
 
 That determines the weights, $a_n$ and $b_n$ is named as **analysis** process,
 
-$$\begin{align}a_0=&\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)dx\\a_n=&\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\cos(nx)dx\\b_n=&\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\sin(nx)dx\end{align},$$
+$$\begin{aligned}a_0=&\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)dx\\a_n=&\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\cos(nx)dx\\b_n=&\frac{1}{\pi}\int_{-\pi}^{\pi}f(x)\sin(nx)dx\end{aligned},$$
 
 where $n=1,2,3,\cdots,\infty$.
 
@@ -22,7 +22,7 @@ where $n=1,2,3,\cdots,\infty$.
 
 An important charateristic of this decomposition is that the base functions form an orthogonal base, i.e.
 
-$$\begin{align}\int_{-\pi}^{\pi}\sin(mx)\sin(nx)dx&=\pi\delta_{m,n}\\\int_{-\pi}^{\pi}\cos(mx)\cos(nx)dx&=\pi\delta_{m,n}\\\int_{-\pi}^{\pi}\sin(mx)\cos(nx)dx&=0\\\int_{-\pi}^{\pi}\sin(mx)dx&=0\\\int_{-\pi}^{\pi}\cos(mx)dx&=0\end{align},$$
+$$\begin{aligned}\int_{-\pi}^{\pi}\sin(mx)\sin(nx)dx&=\pi\delta_{m,n}\\\int_{-\pi}^{\pi}\cos(mx)\cos(nx)dx&=\pi\delta_{m,n}\\\int_{-\pi}^{\pi}\sin(mx)\cos(nx)dx&=0\\\int_{-\pi}^{\pi}\sin(mx)dx&=0\\\int_{-\pi}^{\pi}\cos(mx)dx&=0\end{aligned},$$
 
 where $\delta_{m,n}$ is the Kronecker delta
 
