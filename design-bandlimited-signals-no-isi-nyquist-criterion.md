@@ -1,8 +1,8 @@
-# Design of Band-Limited Signals for No Intersymbol Interference - The Nyquist Criterion
+# Design of Band-Limited Signals for No Intersymbol Interference in Ideal Channel - The Nyquist Criterion
 
 ## Keywords
 
-narrow-band, band-limited, inter-symbol interference, Nyquist Theorem
+narrow-band, band-limited, inter-symbol interference, Nyquist Theorem, ideal channel
 
 ## Review of Narrow-band Transmission Model
 
@@ -12,9 +12,11 @@ $$y(t)=\sum_{n=0}^{\infty}I_nx(t-nT)+n(t),$$
 
 where $y(t)$ is the output signal of the receiver filter (note that the optimum receiver filter for AWGN channel is matched filter), and $x(t)$ the **effective pulse** that combines pulse shaping $g(t)$ at the transmitter, orginal channel response $c(t)$, as well as the receiver filter $f(t)$. Assume the band-limited channel has ideal freqeuncy-response characteristics $C(f)=1$ for $|f|\leq W$. With ideal channel, the only contribution to the effective pulse is the pulse shaping function at the transmitter, if matched filter is applied at the receiver, resulting in $X(f)=|G(f)|^2$. The time-domain pulse signal is $x(t)=\int_{-W}^{W}X(f)e^{j2\pi ft}df$.
 
-$g(t)$ can be also written in a discrete form with $x(t=kT)=x_k$ as
+$g(t)$ can be also written in a discrete form sampling at $t=kT$, i.e. $x(t=kT)=x_k$ as
 
-$$y_k=I_k+\sum_{n=0,n\neq k}^{\infty}I_nx_{k-n}+n_k.$$
+$$y_k=\sum_{n=0}^{\infty}I_nx_{k-n}=x_0\left(I_k+\frac{1}{x_0}\sum_{n=0,n\neq k}^{\infty}I_nx_{k-n}\right)+n_k=I_k+\sum_{n=0,n\neq k}^{\infty}I_nx_{k-n}+n_k，$$
+
+where $x_0$ is normalized to $x_0=1$ for convenience.
 
 ## Design Goal
 
@@ -32,7 +34,7 @@ The above equation is the condition for no intersymbol interference.
 
 **THEOREM**: `Nyquist Theorem`
 
-The neccessaary and sufficient condition for $x(t)$ to satisfy
+Assume ideal channel where $|C(f)|=1$ for $|f|<W$, otherwise zero, the neccessaary and sufficient condition for effective pulse $x(t)$ to satisfy
 
 $$x(nT)=\begin{cases}1&k=0\\0&k\neq0\end{cases}$$
 
