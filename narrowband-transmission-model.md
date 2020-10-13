@@ -24,47 +24,103 @@ An ideal (or nondistorting) band-limited channel is defined as if the amplitude 
 After $v(t)$ goes through the channel $c(t)$, the received signal is the convolution of $v(t)$ and $c(t)$
 
 $$\begin{aligned}
-r(t)&=\int_{-\infty}^{\infty}\sum_{n=-\infty}^{\infty}I_ng(\tau-nT)c(t-\tau)d\tau+z(t)\\&=\sum_{n=-\infty}^{\infty}I_n\int_{-\infty}^{\infty}g(\tau-nT)c(t-\tau)d\tau+z(t)\\&=\sum_{n=-\infty}^{\infty}I_nh(t-nT)+z(t)
+r(t)=&\int_{-\infty}^{\infty}\sum_{n=-\infty}^{\infty}I_ng(\tau-nT)c(t-\tau)d\tau+z(t)\\
+\overset{\tau'=\tau-nT}{=}&\sum_{n=-\infty}^{\infty}I_n\int_{-\infty}^{\infty}g(\tau')c(t-\tau'-nT)d\tau'+z(t)\\
+=&\sum_{n=-\infty}^{\infty}I_nh(t-nT)+z(t)
 \end{aligned},$$
 
 where $h(t)=\int_{-\infty}^{\infty}g(\tau)c(t-\tau)d\tau$ is the effective channel response combining pulse shaping function and pure channel response, and $z(t)$ represents the additive white Gaussian noise (AWGN).
 
-## Filtering the Received Signal
+## Filtering Optimally the Received Signal
 
-The optimum filter (derived from the correlation receiver based on MAP decision rule) at the recevier $f(t)$ for AWGN channel from the point of view of signal detection is **mathched filed**, which matches to the received pulse $f(t)=h(T-t)$. The frequency response is $F(f)=H^*(f)e^{-j2\pi fT}$, the complex conjugate $H^*(f)$ and the phase shift $e^{-j2\pi fT}$ due to sampling delay (Proakis 2008, C4.2).
+The **optimum** filter (derived from the correlation receiver based on MAP decision rule) at the recevier $f(t)$ for AWGN channel from the point of view of signal detection is **mathched filed**, which matches to the received pulse $f(t)=h(T-t)$, followed by a sampler operating at the symbol rate $1/T$. The frequency response is $F(f)=H^*(f)e^{-j2\pi fT}$, the complex conjugate $H^*(f)$ and the phase shift $e^{-j2\pi fT}$ due to sampling delay (Proakis 2008, C4.2).
 
-With the optimum filter at the receiver, the transmission mode can be rewritten to
+### Matched Filter Is Optimum
+
+From Karhunen-Loeve expansion, the received signal can be expanded in the series
+
+$$r(t)=\lim_{N\rightarrow\infty}\sum_{k=1}^{N}r_k\phi_k{t},$$
+
+where $\{\phi_k(t)\}$ is a complete set of orthonormal functions and $\{r_k\}$ are the observalbe random variables obtained by projecting $r(t)$ onto the set $\{\phi_k(t)\}$. This is important, since it maps the continuous received signal $r(t)$ back to digital symbols $\{r_k\}$ as
+
+$$r_k=\sum_{n=-\infty}^{\infty}I_nh_{kn}+z_k,\quad k=1,2,\cdots$$
+
+where $h_{kn}$ is the value obtained from projecting $h(t-nT)$ onto $\phi_k(t)$, and $z_k$ is to project $z(t)$ onto $\phi_k(t)$. The sequence $\{z_k\}$ is Gaussian with zero-mean and covariance $\mathbb{E}[z_k^*z_m]=2N_0\delta_{km}$. Note that for finite sequence, it is normal that the received sequence is longer than the transmitted sequence.
+
+The joint probability density function (PDF) of $\mathbf{r}_N=[r_1,r_2,\cdots,r_N]$ conditioned on the transmitted sequence $\mathbf{I}_P= [I_1,I_2,\cdots,I_P]$ is
+
+$$p(\mathbf{r}_N|\mathbf{I}_P)=\left(\frac{1}{2\pi N_0}\right)^N\exp\left(-\frac{1}{2N_0}\sum_{k=1}^{N}\left|r_k-\sum_{n}I_nh_{kn}\right|^2\right),.$$
+
+The optimum recevied filter, which should be related to $h(t)$, should optimize the above joint PDF. Taking the logrithm of the PDF and ignore the constant, we have
 
 $$\begin{aligned}
-y(t)&=\int_{-\infty}^{\infty}r(\tau)f^*(t-\tau)d\tau\\
-&=\int_{-\infty}^{\infty}r(\tau)h(T-t+\tau)d\tau\\
-&=\sum_{n=-\infty}^{\infty}I_n\int_{-\infty}^{\infty}[h(\tau-nT)+z(\tau)]h(\tau-t+T)d\tau\\
-&=\sum_{n=-\infty}^{\infty}I_nx(t-nT)+n(t),\\
+    \log p(\mathbf{r}_N|\mathbf{I}_P)=&-\sum_{k=1}^{N}\left|r_k-\sum_{n}I_nh_{kn}\right|^2\\
+    =&-\sum_{k=1}^{N}(r_k-\sum_{n}I_nh_{kn})(r_k-\sum_{n}I_nh_{kn})^*\\
+    =&-\sum_{k=1}^{N}\left(r_kr_k^*-r_k\sum_{n}I_n^*h_{kn}^*-r_k^*\sum_{n}I_nh_{kn}+\sum_{n}I_nh_{kn}\sum_{m}I_m^*h_{km}^*\right)\\
+    =&-\sum_{k=1}^{N}|r_k|^2-\sum_{n}\sum_{m}\left(I_nI_m^*\sum_{k=1}^{N}h_{kn}h_{km}^*\right)+2\mathcal{Re}\left(\sum_{n}I_n\left(\sum_{k=1}^{N}r_kh_{kn}^*\right)\right).
 \end{aligned}$$
 
-where $x(t)=\int_{-\infty}^{\infty}h^*(t)h(t+nT)dt$ is the filtered output of received response at the receiver, sampling at the rate of $1/T$. $n(t)=\int_{-\infty}^{\infty}z(\tau)h(\tau-t+T)d\tau$ is the filtered noise. Note that $x(t)$ represents also the autocorrelation function of $h(t)$, taken periodically at $1/T$.
+The optimation is related to $\{r_k\}$. For the first term, the power of $r_k$ is often assumed to be fixed to some value, such as unity. Therefore, To maximize the log of PDF is to maximize the third term, we just need to maximize the term $\sum_{k=1}^{N}r_kh_{kn}^*$, which is called *sufficient statistics* in this optimization problem. Therefore, with
+
+$$y_n=y(nT)=\int_{-\infty}^{\infty}r(t)h^*(t-nT)dt,$$
+
+we have sufficient information to do the decision. Therefore, the optimum filter at time instant $t=nT$ is $f(t)=h(-t+nT)$.
+
+With the optimum filter at the receiver at time instant $t=nT$, the transmission mode can be rewritten to
+
+$$\begin{aligned}
+y(t=kT)=&y_k=\int_{-\infty}^{\infty}r(\tau)f^*(kT-\tau)d\tau\\
+=&\sum_{n=-\infty}^{\infty}I_n\int_{-\infty}^{\infty}[h(\tau-nT)+z(\tau)]h^*(\tau-kT)d\tau\\
+\overset{\tau'=\tau-kT}{=}&\sum_{n=-\infty}^{\infty}I_nx_{k-n}+n_k,\\
+\end{aligned}$$
+
+where $x_n=x(t=nT)=\int_{-\infty}^{\infty}h^*(\tau)h(\tau+nT)d\tau$ is the filtered output of received response at the receiver, sampling at the rate of $1/T$. $n_n=n(t=nT)=\int_{-\infty}^{\infty}z(\tau)h^*(\tau-nT)d\tau$ is the filtered noise. Note that $x(t)$ represents also the autocorrelation function of $h(t)$.
 
 This is the most-used channel model in narrow-band channel. The complex signal symbols are carried by the effective pulse $x(t)$ and its shifted version. This effective pulse includes effect of pulse shaping function at the transmitter, channel response, as well as optimum receiver filter.
 
-It is interesting to discuss the distribution of the noise. $z(t)$ can be modeled as AWGN, i.e. $z(t)\sim\mathcal{N}(0,N_0)$. For different time index, $z(t_1)$ and $z(t_2)$ is independent, which gives $\mathbb{E}[z^*(t_1)z(t_2)]=0$ for $t_1\neq t_2$. However, after the matched filter, we have
+### Discrete-Time Signal with Sampling Rate $1/T$
 
-$$\begin{aligned}
-    \mathbb{E}[n^*(t_1)n(t_2)]=\int_{-\infty}^{\infty}z(\tau)h(\tau-t_1+T)d\tau\int_{-\infty}^{\infty}z(u)h(u-t_2+T)du
-\end{aligned}$$
+Hence, assume that the output is sampled at $t=kT$, we can obtain the discrete-time signal
 
-## Discrete-Time Signal with Sampling Rate $1/T$
+$$y_k=\sum_{n=-\infty}^{\infty}I_nx_{k-n}+n_k.$$
 
-Assume that the output is sampled at $t=kT$, we can obtain the discrete-time signal
+Note that the index $k$ is for the observation. The amount of the observation samples could be different from the length of the transmitted symbol sequence. The above equation can be rewritten to clearly illustrate ISI effect
 
-$$y_k=\sum_{n=0}^{\infty}I_nx_{k-n}+n_k.$$
-
-The above equation can be rewritten to clearly illustrate ISI effect
-
-$$y_k=x_0I_k+\sum_{n=0,n\neq k}^{\infty}I_nx_{k-n}+n_k,$$
+$$y_k=x_0I_k+\sum_{n=-\infty,n\neq k}^{\infty}I_nx_{k-n}+n_k,$$
 
 where the second term is the ISI component.
 
-Normally we assume that the ISI affects a finite number of symbols, i.e. $x_n=0$ for $|n|>L$. $x_n$ is often named as ***equivalent discrete-time transversal filter***. With $2L$ non-zero coefficient, this filter spans a time interval of $2LT$ seconds. 
+Normally we assume that the ISI affects a finite number of symbols, i.e. $x_n=0$ for $|n|>L$. $x_n$ is often named as ***equivalent discrete-time transversal filter***. With $2L$ non-zero coefficients, this filter spans a time interval of $2LT$ seconds. 
+
+## Further Filtering: Whitened Matched Filter
+
+It is interesting to discuss the distribution of the noise. $z(t)$ can be modeled as AWGN, i.e. $z(t)\sim\mathcal{N}(0,2N_0)$. Assume that the equivalent discrete-time transversal filter spans a time interval of $2LT$ seconds. For different time index, $t_1$ and $t_2$ are independent, which gives 
+
+$$\mathbb{E}[z^*(t_1)z(t_2)]=\begin{cases}
+    2N_0,&t_1=t_2\\
+    0,&t_1\neq t_2.
+\end{cases}$$
+
+However, after the matched filter $f(t)$, we have
+
+$$\begin{aligned}
+    \mathbb{E}[n^*_{k_1}n_{k_2}]=&\mathbb{E}\left[\int_{-\infty}^{\infty}z^*(\tau)h^*(\tau-k_1T)d\tau\int_{-\infty}^{\infty}z(t)h(t-k_2T)dt\right]\\
+    =&\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\mathbb{E}\left[z^*(\tau)z(t)\right]h^*(\tau-k_1T)h(t-k_2T)d\tau dt\\
+    =&2N_0\int_{-\infty}^{\infty}h^*(\tau-k_1T)h(\tau-k_2T)d\tau\\
+    =&2N_0x_{k_1-k_2}
+\end{aligned}$$
+
+for $|k_1-k_2|\leq L$. Otherwise, it is 0.
+
+We can see that the noise is correlated in general. For furhter performance evaluation, such as calculating the error rate, it is desirable to whiten the noise sequence by further filtering the sequence $\{y_k\}$.
+
+Now we denote the two-sided $z$ transform $X(z)$ of the sampled autocorrelation function $x_k$ as
+
+$$X(z)=\sum_{k=-L}^{L}x_kz^{-k}.$$
+
+For the autocorrelation, we have $x_k=x_{-k}^*$, resulting in $X(z)=X^*(\frac{1}{z^*})$.
+
+$$X(z)=F(z)F^*\left(\frac{1}{z^*}\right)$$
 
 ---
 

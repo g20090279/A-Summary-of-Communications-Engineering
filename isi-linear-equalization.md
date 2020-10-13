@@ -67,3 +67,9 @@ $$C(z)=\frac{1}{X(z)}$$
 
 ## Criterion 2: Mean Square Error (MSE)
 
+## Baseband Equalizer
+
+<img src="linear-equalization-baseband.png" alt="linear transversal filter" width="600"/>
+
+## Passband Equalizer
+
