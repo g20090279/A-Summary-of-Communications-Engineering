@@ -126,9 +126,9 @@ $$\begin{aligned}
 
 These two solutions lead to different average transmitted power, resulting in different SNR.
 
-## Further Filtering: Whitened Matched Filter
+## Further Filtering: Whitened Matched Filter (Forney 1972)
 
-It is interesting to discuss the distribution of the noise. $z(t)$ can be modeled as AWGN, i.e. $z(t)\sim\mathcal{N}(0,2N_0)$. Assume that the equivalent discrete-time transversal filter spans a time interval of $2LT$ seconds. Assume wide-sense stationary (WSS) channel, for different time index, $t_1$ and $t_2$ are independent, which gives 
+It is interesting to discuss the distribution of the noise. $z(t)$ can be modeled as AWGN, i.e. $z(t)\sim\mathcal{N}(0,\sigma^2)$. Assume that the equivalent discrete-time transversal filter spans a time interval of $2LT$ seconds. Assume wide-sense stationary (WSS) channel, for different time index, $t_1$ and $t_2$ are independent, which gives 
 
 $$\mathbb{E}[z^*(t_1)z(t_2)]=\begin{cases}
     2N_0,&t_1=t_2\\
@@ -140,11 +140,11 @@ which is also called **white noise**. However, after the matched filter $f(t)$, 
 $$\begin{aligned}
     \mathbb{E}[n^*_{k_1}n_{k_2}]=&\mathbb{E}\left[\int_{-\infty}^{\infty}z^*(\tau)h^*(\tau-k_1T)d\tau\int_{-\infty}^{\infty}z(t)h(t-k_2T)dt\right]\\
     =&\int_{-\infty}^{\infty}\int_{-\infty}^{\infty}\mathbb{E}\left[z^*(\tau)z(t)\right]h^*(\tau-k_1T)h(t-k_2T)d\tau dt\\
-    =&2N_0\int_{-\infty}^{\infty}h^*(\tau-k_1T)h(\tau-k_2T)d\tau\\
-    =&2N_0x_{k_1-k_2}
+    =&\sigma^2\int_{-\infty}^{\infty}h^*(\tau-k_1T)h(\tau-k_2T)d\tau\\
+    =&\sigma^2x_{k_1-k_2}
 \end{aligned}$$
 
-for $|k_1-k_2|\leq L$. Otherwise, it is 0.
+for $|k_1-k_2|\leq L$. Otherwise, it is 0. This means that after the matched filter, the AWGN is transformed to the **colored Gaussian noise**.
 
 We can see that the noise is correlated in general， except when $x_k=0,k\neq0$. For furhter performance evaluation, such as calculating the error rate, it is desirable to whiten the noise sequence by further filtering the sequence $\{y_k\}$.
 
@@ -158,15 +158,24 @@ $$X(z)=A(z)A^*\left(\frac{1}{z^*}\right),$$
 
 where $A(z)$ is a polynomial of degree $L$ having the roots $\rho_1,\rho_2,\cdots,\rho_L$ and $A^*(1/z^*)$ having roots $1/\rho_1,1/\rho_2,\cdots,1/\rho_L$.
 
-Therefore, if we have a filter
+The colored noise $N(z)$ can be represented as
+
+$$N(z)=Z(z)A^*\left(\frac{1}{z^*}\right)$$
+
+Therefore, for the matched filter output $Y(Z)=X(z)I(z)+N(z)$, we can see that if we have a filter
 
 $$J(z)=\frac{1}{A^*\left(\frac{1}{z^*}\right)},$$
 
-the roots $\rho$ and correspondingly $1/\rho$ become poles.
+the filtered noise is transformed back to $Z(z)$ again, which is white. This filter $J(z)$ is called ***whitened noise filter***. And the overall effective filter $A(z)$ is named as ***whitened matched filter***.
 
+Until now, we can see that we have discussed step by step different equivalent channel depicted as following by adding different modules.
+
+<img src="narrowband-transmission-model-whitened-matched-filter.png" alt="linear transversal filter" width="1000"/>
 
 ---
 
 References
+
+- Forney G., (1972). Maximum-likelihood sequence estimation of digital sequences in the presence of intersymbol interference. IEEE Transactions on Information Theory, vol. 18, no. 3, pp. 363-378.
 
 - Proakis J. G., and Salehi M., (2008). Digital Communications, 5th Edition. McGraw-Hill.
