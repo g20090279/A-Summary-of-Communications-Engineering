@@ -90,18 +90,52 @@ $$y_k=x_0I_k+\sum_{n=-\infty,n\neq k}^{\infty}I_nx_{k-n}+n_k,$$
 
 where the second term is the ISI component.
 
-Normally we assume that the ISI affects a finite number of symbols, i.e. $x_n=0$ for $|n|>L$. $x_n$ is often named as ***equivalent discrete-time transversal filter***. With $2L$ non-zero coefficients, this filter spans a time interval of $2LT$ seconds. 
+Normally we assume that the ISI affects a finite number of symbols, i.e. $x_n=0$ for $|n|>L$. $x_n$ is often named as ***equivalent discrete-time transversal filter***. With $2L$ non-zero coefficients, this filter spans a time interval of $2LT$ seconds.
+
+### Ideal Channel and Distorted Channel
+
+Consider **ideal channel**, i.e. $C(f)=1$ when $|f|\leq W$, for designing band-limited signals fro no ISI, $x_k$ should follow *Nyquist Theorem*. The block diagram of the signal model would be
+
+<img src="narrowband-transmission-model-block-diagram-ideal-channel.png" alt="linear transversal filter" width="600"/>
+
+For channels with distortion, 
+
+<img src="narrowband-transmission-model-block-diagram-distorted-channel.png" alt="linear transversal filter" width="600"/>
+
+From above, we have derived that the optimum demodulation filter is matched filter. Here, we talk about a little bit about the suboptimum doemodulator.
+
+At the output of the demodulator, we have 
+
+$$G_T(f)C(f)G_R(f)=X_de^{-j2\pi ft_0},\quad |f|\leq W,$$
+
+where $X_d(f)$ is the desired frequency response of the cascade of the modulator, channel, and demodulator. If we design $X_d(f)$ to a raised cosine filter $X_{rc}(f)$, according to Nyquist nonISI theorem, we will have zero ISI at the output. Assume that $C(f)$ is known, we can have two possible solutions
+
+#### Precompensate for the total channel distortion at the transmitter, recevier filter matched to the recevied signal
+
+$$\begin{aligned}
+    |G_T(f)|=&\frac{\sqrt{X_{rc}(f)}}{|C(f)|},\quad |f|\leq W\\
+    |G_R(f)|=&\sqrt{X_{rc}(f)},\quad |f|\leq W.
+\end{aligned}$$
+
+#### Compensate the channel both at the transmitter and receiver filter
+
+$$\begin{aligned}
+    |G_T(f)|=&\frac{\sqrt{X_{rc}(f)}}{|C(f)|^{1/2}},\quad |f|\leq W\\
+    |G_R(f)|=&\frac{\sqrt{X_{rc}(f)}}{|C(f)|^{1/2}},\quad |f|\leq W.
+\end{aligned}$$
+
+These two solutions lead to different average transmitted power, resulting in different SNR.
 
 ## Further Filtering: Whitened Matched Filter
 
-It is interesting to discuss the distribution of the noise. $z(t)$ can be modeled as AWGN, i.e. $z(t)\sim\mathcal{N}(0,2N_0)$. Assume that the equivalent discrete-time transversal filter spans a time interval of $2LT$ seconds. For different time index, $t_1$ and $t_2$ are independent, which gives 
+It is interesting to discuss the distribution of the noise. $z(t)$ can be modeled as AWGN, i.e. $z(t)\sim\mathcal{N}(0,2N_0)$. Assume that the equivalent discrete-time transversal filter spans a time interval of $2LT$ seconds. Assume wide-sense stationary (WSS) channel, for different time index, $t_1$ and $t_2$ are independent, which gives 
 
 $$\mathbb{E}[z^*(t_1)z(t_2)]=\begin{cases}
     2N_0,&t_1=t_2\\
-    0,&t_1\neq t_2.
+    0,&t_1\neq t_2,
 \end{cases}$$
 
-However, after the matched filter $f(t)$, we have
+which is also called **white noise**. However, after the matched filter $f(t)$, we have
 
 $$\begin{aligned}
     \mathbb{E}[n^*_{k_1}n_{k_2}]=&\mathbb{E}\left[\int_{-\infty}^{\infty}z^*(\tau)h^*(\tau-k_1T)d\tau\int_{-\infty}^{\infty}z(t)h(t-k_2T)dt\right]\\
@@ -112,15 +146,24 @@ $$\begin{aligned}
 
 for $|k_1-k_2|\leq L$. Otherwise, it is 0.
 
-We can see that the noise is correlated in general. For furhter performance evaluation, such as calculating the error rate, it is desirable to whiten the noise sequence by further filtering the sequence $\{y_k\}$.
+We can see that the noise is correlated in general， except when $x_k=0,k\neq0$. For furhter performance evaluation, such as calculating the error rate, it is desirable to whiten the noise sequence by further filtering the sequence $\{y_k\}$.
 
 Now we denote the two-sided $z$ transform $X(z)$ of the sampled autocorrelation function $x_k$ as
 
 $$X(z)=\sum_{k=-L}^{L}x_kz^{-k}.$$
 
-For the autocorrelation, we have $x_k=x_{-k}^*$, resulting in $X(z)=X^*(\frac{1}{z^*})$.
+For the autocorrelation, we have $x_k=x_{-k}^*$, resulting in $X(z)=X^*(\frac{1}{z^*})$, and the $2L$ roots of $X(z)$ have the symmetry that if $\rho$ is a root, so is $1/\rho^*$. Due to this fact, the $X(z)$ can be factored as
 
-$$X(z)=F(z)F^*\left(\frac{1}{z^*}\right)$$
+$$X(z)=A(z)A^*\left(\frac{1}{z^*}\right),$$
+
+where $A(z)$ is a polynomial of degree $L$ having the roots $\rho_1,\rho_2,\cdots,\rho_L$ and $A^*(1/z^*)$ having roots $1/\rho_1,1/\rho_2,\cdots,1/\rho_L$.
+
+Therefore, if we have a filter
+
+$$J(z)=\frac{1}{A^*\left(\frac{1}{z^*}\right)},$$
+
+the roots $\rho$ and correspondingly $1/\rho$ become poles.
+
 
 ---
 

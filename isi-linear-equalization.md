@@ -12,7 +12,7 @@ The optimal method to detect signal in ISI channel is maximum likelihood sequenc
 
 One approach is a linear transversal filter, whose computational complexity is a linear function of the channel dispersion length $L$.
 
-<img src="linear-equalization-isi-fig-1.png" alt="linear transversal filter" width="500"/>
+<img src="isi-linear-equalization-fig-1.png" alt="linear transversal filter" width="500"/>
 
 The input unequalized received sequence (or output of the receiver filter) $\{y_k\}$, the output sequence $\{\hat{I}_k\}$ of the linear transversal filter is
 
