@@ -1,5 +1,7 @@
 # Transimission Model for Narrow-band Signal and Channel
 
+Hashname: 6ad0611ed5bc0a29f0cafafe0bfc24ee
+
 Keywords: transmission, complex baseband, band-limited, pulse shaping, matched filter, optimum receiver filter
 
 ## Baseband (Lowpass) Transmitted Signal
@@ -167,6 +169,12 @@ Therefore, for the matched filter output $Y(Z)=X(z)I(z)+N(z)$, we can see that i
 $$J(z)=\frac{1}{A^*\left(\frac{1}{z^*}\right)},$$
 
 the filtered noise is transformed back to $Z(z)$ again, which is white. This filter $J(z)$ is called ***whitened noise filter***. And the overall effective filter $A(z)$ is named as ***whitened matched filter***.
+
+The equivalent channel model after the whitened matched filter is $A(z)$, which is called ***discrete-time noise-whitening filter***. The transmission model can be written as
+
+$$y_k=\sum_{n=0}^{L}a_nI_{k-n}+\eta_k.$$
+
+## Block Diagram of Equivalent Channel Model
 
 Until now, we can see that we have discussed step by step different equivalent channel depicted as following by adding different modules.
 
