@@ -20,7 +20,9 @@ With the symbol rate becoming larger, the signal bandwidth becomes larger. If th
 
 The equalizer in single-carrier transmission is usually done in the time domain. The **optimum** equalizer for the multi-path fading channel is **maximum-likelihood sequence detector (MLSD)**. One type of **suboptimum** equalizers is the **linear** transversal filter (such as **zero-forcing**, **least-square**, **minimum mean square error**). The **decision-feedback equalizer** exploits the **nonlinearity** by adding a feedback module to improve performance of the linear equalization.
 
-# History of OFDM
+# OFDM History
+
+In the mid 60s, the concept of using parallel data transmission and frequency division multiplexing (FDM) was published, where overlapping subchannels are used to **avoid the high speed equalization in the time domain**. The inital applications were in military communications. Later, it was applied in telecommunication field, where the discrete multi-tone (DMT) and the multicarrier modulation (MCM) are standarized.
 
 **<to do>**
 
@@ -129,6 +131,10 @@ $$x[n]=\sum_{l=-\infty}^{\infty}x_l[n]=\sum_{l=-\infty}^{\infty}\left(h_{RC}[n-l
 
 ## Coded OFDM (COFDM)
 
+Coded OFDM introduces **channel coding** to further protect transmitted data ion some individual subchannels. OFDM provides a means to transmit data in a frequency selective channel. However, OFDM does not suppress the fading itself (Zou, 1995).
+
+> Among those channel coding techniques, trellis coded modulation (TCM) combined with frequency and time interleaving is considered the most effective means for a frequency selective fading channel (Zou, 1995).
+
 ## Cyclic-Prefix OFDM (CP-OFDM) [LTE & 5G Standard]
 
 CP-OFDM is the traditional OFDM with cylic prefix.
@@ -161,6 +167,7 @@ Relative to FFT, the WFT algorithm significantly reduces the number of multiplic
 
 # References
 
-- Cho, Y. S., Kim, J., Yang, W. Y., &amp; Kang, C. G. (2010). MIMO-OFDM wireless communications with MATLAB. Singapore, Singapore: John Wiley &amp; Sons (Asia) Pte.
-- Pauli, M., &amp; Kuchenbecker, P. (n.d.). On the reduction of the out-of-band radiation of OFDM-signals. ICC '98. 1998 IEEE International Conference on Communications. Conference Record. Affiliated with SUPERCOMM'98 (Cat. No.98CH36220). doi:10.1109/icc.1998.683036
+- Cho, Y. S., Kim, J., Yang, W. Y., & Kang, C. G. (2010). MIMO-OFDM wireless communications with MATLAB. Singapore, Singapore: John Wiley & Sons (Asia) Pte.
+- Pauli, M., & Kuchenbecker, P. (1998). On the reduction of the out-of-band radiation of OFDM-signals. 1998 IEEE International Conference on Communications.
 - Prasad, R. (2004). OFDM for wireless communications systems. Boston: Artech House.
+- Zou, W. Y., & Wu Y. (1995). COFDM: an overview. IEEE Transactions on Broadcasting, vol. 41, no. 1.
