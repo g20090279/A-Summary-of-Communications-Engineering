@@ -58,7 +58,7 @@ Figure: OFDM System Block Diagram (2010 Cho).
 
 If there are $N_{sub}$ subcarriers, OFDM transmitter can map $N_{sub}$ parallel PSK or QAM symbols from S/P conversion into each subcarrier. Let $X_l[k]$ denote the $l$-th transmit OFDM symbol at the $k$-th subcarrier, $l=0,1,2,\cdots,\infty$, and $k=0,1,2,\cdots,N_{sub}-1$. The discrete-time baseband OFDM signal sampled at $t=lT_{OFDM}+nT_s$ is
 
-$$x_l[n]=\frac{1}{N_{sub}}\sum_{k=0}^{N_{sub}-1}X_l[k]e^{j2\pi kn/N_{sub}},\quad n=0,1,\cdots,N_{sub}-1.$$
+$$x_l[n]=\frac{1}{\sqrt{N_{sub}}}\sum_{k=0}^{N_{sub}-1}X_l[k]e^{j2\pi kn/N_{sub}},\quad n=0,1,\cdots,N_{sub}-1.$$
 
 At the receiver, the transmitted OFDM symbol $X_[k]$ can be reconstructed by the orthogonality among the subcarrieres as
 
