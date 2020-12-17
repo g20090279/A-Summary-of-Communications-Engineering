@@ -9,6 +9,8 @@ $T_{OFDM}$ | duration of a OFDM symbol
 $T_{sub}$ | duration of a OFDM symbol without guard interval
 $T_{g}$ | duration of guard interval (e.g. CP)
 $N_{sub}$ | number of subcarriers without guard interval
+$n$ | the sample time index
+$k$ | the subcarrier index
 
 # Overview of Single-Carrier Transmission
 
@@ -54,19 +56,80 @@ $$P_x(f)=\lim_{T\rightarrow\infty}\left(\frac{1}{T}\mathbb{E}\left[\left|\mathca
 
 Figure: OFDM System Block Diagram (2010 Cho).
 
-## OFDM Modulation (IDFT) and Demodulation (DFT)
+For simplicity, we make the following **assumptions**
 
-If there are $N_{sub}$ subcarriers, OFDM transmitter can map $N_{sub}$ parallel PSK or QAM symbols from S/P conversion into each subcarrier. Let $X_l[k]$ denote the $l$-th transmit OFDM symbol at the $k$-th subcarrier, $l=0,1,2,\cdots,\infty$, and $k=0,1,2,\cdots,N_{sub}-1$. The discrete-time baseband OFDM signal sampled at $t=lT_{OFDM}+nT_s$ is
+- perfect frequency synchronization,
+- perfect analog components,
+- cyclic prefix is longer than the maximum channel delay (the system is free of intersymbol interference).
 
-$$x_l[n]=\frac{1}{\sqrt{N_{sub}}}\sum_{k=0}^{N_{sub}-1}X_l[k]e^{j2\pi kn/N_{sub}},\quad n=0,1,\cdots,N_{sub}-1.$$
+## Orthogonality
 
-At the receiver, the transmitted OFDM symbol $X_[k]$ can be reconstructed by the orthogonality among the subcarrieres as
+Since the system is **free of ISI**, it is sufficient to consider **a single OFDM symbol**. Consider the family of complex sinusoid
+
+$$c_k[n]=\frac{1}{\sqrt{N_{sub}}}e^{j2\pi kn/N_{sub}},\quad k=0,1,\cdots,N_{sub}-1.$$
+
+Clearly, these functions are cyclic with period $N_{sub}$. Furthermore, they are pairwise orthogonal, as can easily be shown:
 
 $$\begin{aligned}
-    Y_[k]&=\sum_{n=0}^{N-1}y_l[n]e^{-j2\pi kn/N}\\
-    &=\sum_{n=0}^{N-1}\left\{\sum_{m=0}^{\infty}h_l[m]x_l[n-m]+z_l[m]\right\}e^{-j2\pi kn/N}\\
-    &=\sum_{n=0}^{N-1}\left\{\sum_{m=0}^{\infty}h_l[m]x_l[n-m]\right\}e^{-j2\pi kn/N}+\sum_{m=0}^{\infty}\sum_{n=0}^{N-1}z_l[m]\\
+    \sum_{n=0}^{N_{sub}-1}c_{k_1}[n]c^*_{k_2}[n]&=\frac{1}{N_{sub}}\sum_{n=0}^{N_{sub}-1}e^{j2\pi(k_1-k_2)n/N_{sub}}\\
+    &=\begin{cases}
+        1, & k_1=k_2\\
+        0, & k_1\neq k_2.
+    \end{cases}
 \end{aligned}$$
+
+This indicates that every subcarrier is orthogonal to each other with the help of the basis $c_k[n]$.
+
+## OFDM Modulation (IDFT) and Demodulation (DFT)
+
+### OFDM Modulation - IDFT
+
+If there are $N_{sub}$ subcarriers, OFDM transmitter can map $N_{sub}$ parallel PSK or QAM symbols from S/P conversion into each subcarrier. The data symbol at each subcarrier is usually **phase shift keying** (PSK) or **quadrature amplitude modulation** (QAM) symbol. These data symbols are transmitted as the weighted superposition of the base functions $c_k[n]$. 
+
+Let $X_m[k]$ denote the $m$-th transmit OFDM symbol at the $k$-th subcarrier (data symbol $a[k]$), $m=0,1,2,\cdots,M-1$, and $k=0,1,2,\cdots,N_{sub}-1$. The **discrete time-domain baseband OFDM signal** sampled at $t=mT_{OFDM}+nT_s$ is the *inverse discrete Fourier transform* (IDFT):
+
+$$x_m[n]=\frac{1}{\sqrt{N_{sub}}}\sum_{k=0}^{N_{sub}-1}X_m[k]e^{j2\pi kn/N_{sub}},\quad n=0,1,\cdots,N_{sub}-1.$$
+
+Written in a vector form, the above equation becomes
+
+$$\mathbf{x}_m=\mathbf{W}^{H}\mathbf{X}_m,$$
+
+where the data symbol vector $\mathbf{X}_m=[X_m[0],\cdots,X_m[{N_{sub}-1]}]^T$, the time-domain sample vector for one OFDM symbol $\mathbf{x}_m=[x_m[0],\cdots,x_m[N_{sub}-1]]^T$, and the DFT matrix $\mathbf{W}(k,n)=e^{-j2\pi kn/N_{sub}}$.
+
+### OFDM Demodulation - DFT
+
+Assume a channel with $L$ finit taps, i.e., $\mathbf{h}=[h[0],h[1],\cdots,h[L-1]]^T$, remains unchanged for all the OFDM symbols. At the receiver, the time-domain received signal is denoted as $y_m[n]$, which is
+
+$$y_m[n]=\sum_{l=0}^{L-1}h[l]x_m[(n-l)\text{ mod }N_{sub}]+z_m[n],$$
+
+where $z_m[n]$ is additive white Gaussian noise (AWGN) with zero mean and variance $\sigma_z^2$.
+
+With the *discrete Fourier transform* (DFT), the transmitted OFDM symbol $X_m[k]$ can be reconstructed by the orthogonality among the subcarrieres as
+
+$$\begin{aligned}
+    Y_m[k]&=\frac{1}{\sqrt{N_{sub}}}\sum_{n=0}^{N_{sub}-1}y_m[n]e^{-j2\pi kn/N_{sub}}\\
+    &=\frac{1}{\sqrt{N_{sub}}}\sum_{n=0}^{N_{sub}-1}\left\{\sum_{l=0}^{L-1}h[l]x_m[(n-l)\text{ mod }N_{sub}]+z_m[n]\right\}e^{-j2\pi kn/N}\\
+    &=\frac{1}{\sqrt{N_{sub}}}\sum_{n=0}^{N_{sub}-1}\left\{\sum_{l=0}^{L-1}h[l]x_m[(n-l)\text{ mod }N_{sub}]\right\}e^{-j2\pi kn/N}+\sum_{n=0}^{N-1}z_m[n]e^{-j2\pi kn/N}\\
+    &=\frac{1}{N_{sub}}\sum_{n=0}^{N_{sub}-1}\sum_{l=0}^{L-1}h[l]\sum_{\mu=0}^{N_{sub}-1}X_m[\mu]e^{j2\pi\mu (n-l)/N_{sub}}e^{-j2\pi kn/N}+Z_m[k]\\
+    &=\frac{1}{N_{sub}}\sum_{l=0}^{L-1}\sum_{\mu=0}^{N_{sub}-1}h[l]X_m[\mu]e^{-j2\pi\mu l/N_{sub}}\sum_{n=0}^{N_{sub}-1}e^{j2\pi(\mu-k)n/N}+Z_m[k]\\
+    &=\cancel{\frac{1}{N_{sub}}}\sum_{l=0}^{L-1}\sum_{\mu=0}^{N_{sub}-1}h[l]X_m[\mu]e^{-j2\pi\mu l/N_{sub}}\cancel{N_{sub}}\delta[\mu-k]+Z_m[k]\\
+    &=\sum_{l=0}^{L-1}h[l]X_m[k]e^{-j2\pi kl/N_{sub}}+Z_m[k]\\
+    &=\left(\sum_{l=0}^{L-1}h[l]e^{-j2\pi kl/N_{sub}}\right)X_m[k]+Z_m[k]\\
+    &=H[k]X_m[k]+Z_m[k].
+\end{aligned}$$
+
+The $H[k]=\sum_{l=0}^{L-1}h[l]e^{-j2\pi kl/N_{sub}}$ is the DFT of the channel impulse response. In other words, $H[k]$ is the channel transfer function, evaluated at the frequency of the $k$-th subcarrier.
+
+The noise term $\mathbf{Z}_m=\mathbf{W}\mathbf{z}_m$ is the DFT of the time domain noise $\mathbf{z}_m=[z_m[0],\cdots,z_m[N_{sub}-1]]$. $Z_m[k]$ is the linear combination of $z_m[n]$, and hence is Gaussin, and with zero mean and covariance matrix
+
+$$\begin{aligned}
+    \mathbb{E}\left[\mathbf{Z}_m\mathbf{Z}_m^H\right]&=\mathbb{E}\left[\mathbf{W}\mathbf{z}_m\mathbf{z}_m^H\mathbf{W}^H\right]\\
+    &=\mathbf{W}\mathbb{E}\left[\mathbf{z}_m\mathbf{z}_m^H\right]\mathbf{W}^H\\
+    &=\mathbf{W}\sigma_{z}^2\mathbf{I}\mathbf{W}^H\\
+    &=\sigma_{z}^2\mathbf{I}
+\end{aligned}$$
+
+If $l=0$, i.e. a single-path channel, $H[k]=1$ for all $k$.
 
 ## Guard Interval
 
@@ -74,7 +137,7 @@ $$\begin{aligned}
 
 In this module, the last $N_{CP}$ samples of the $N_{IFFT}$ points are copied at the front of the symbol, creating a composite symbol that is $N_{CP}+N_{IFFT}$ samples long. Doing this has the effect of making the composite symbol appear continuous in time, that is, the $N_{IFFT}$-point FFT of the smbol will be identical regardless of which $N_{IFFT}$ samples we choose out of the $N_{CP}+N_{IFFT}$ available samples, preventing multipath fading.
 
-With CP, the convolution in the time domain is equivalent to the multiplication of DFT in the frequency domain for each subcarrier. Note that $Y_l[k]\neq H_l[k]X_l[k]$ without CP, since $\mathrm{DFT}\{y_l[n]\}\neq\mathrm{DFT}\{x_l[n]\}$.
+With CP, the convolution in the time domain is equivalent to the multiplication of DFT in the frequency domain for each subcarrier. Note that $y_m[k]\neq H_l[k]X_l[k]$ without CP, since $\mathrm{DFT}\{y_m[n]\}\neq\mathrm{DFT}\{x_l[n]\}$.
 
 The length of CP should be not less than the equivalent channel length (number of channel taps) to remove the ISI for OFDM symbols.
 
@@ -156,6 +219,8 @@ The $N$-point DFT is
 $$X[k]=\sum_{n=0}^{N-1}x[n]W_N^{nk},\quad k=0,1,\cdots,N-1,$$
 
 where $W_N=e^{-j2\pi/N}$. Each of $N$ subcarriers has $N$ multiplications and a summation, resulting in the $\mathcal{O}(N^2)$ arithmetic complexity.
+
+The *fast Fourier transform* (FFT) reduces the complexity of normal DFT $\mathcal{O}(N^2)$ to $\mathcal{O}(N\log N)$, which is a **major reason** for the **widespread** use of OFDM even in **low-cost** consumer electronics.
 
 ## Fast Fourier Transform (FFT)
 
