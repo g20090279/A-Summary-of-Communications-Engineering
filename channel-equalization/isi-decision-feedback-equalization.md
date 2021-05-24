@@ -13,7 +13,7 @@ keywords: nonlinear equalizer, decision feedback, feedforward filter, feedback f
 
 ## General Structure of DFE
 
-<img src="isi-decision-feedback-equalization-structure.png" alt="linear transversal filter" width="500"/>
+<img src="./images/isi-decision-feedback-equalization-structure.png" alt="linear transversal filter" width="500"/>
 
 Fig. 1: Structure of decision-feedback equalization
 

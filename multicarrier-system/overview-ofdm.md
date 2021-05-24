@@ -22,15 +22,75 @@ With the symbol rate becoming larger, the signal bandwidth becomes larger. If th
 
 The equalizer in single-carrier transmission is usually done in the time domain. The **optimum** equalizer for the multi-path fading channel is **maximum-likelihood sequence detector (MLSD)**. One type of **suboptimum** equalizers is the **linear** transversal filter (such as **zero-forcing**, **least-square**, **minimum mean square error**). The **decision-feedback equalizer** exploits the **nonlinearity** by adding a feedback module to improve performance of the linear equalization.
 
-## 2.1. Single-Carrier Transmission vs. Multi-Carrier Transmission
+## 2.1. Single-Carrier (SC) Transmission vs. Multi-Carrier (MC) Transmission
 
 OFDM procession requires on the order of $\log_2M$ multiplications per data symbol, counting both transmitter and receiver operation, where $M$ is the length of the block of the signal, and is proportional to the maximum expected channel response length (at least 4-10 times longer than the maximum impulse response span to minimize the fraction of overhead). For single-carrier transmission under sever multi-path effect, the complexity (the number of taps of the time domain linear filter) is considerably high. Therefore, **OFDM** appears to offer a **better** performance/complexity trade-off than conventional SC modulation with time domain equalization for **large** (> about 20 taps) multipath spread (McDonnel, 1996), (Falconer, 2002).
 
-# 3. OFDM History
+### 2.1.1. Equalization of SC Transmission
+
+Sari et al. (Sari, 1994 & Sari, 1995) pointed out that when combined with **FFT processing** and the use of a **cyclic prefix**, a single-carrier system with frequency-domain equalization (FDE) (SC-FDE) has essentially the **same performance** and **low complexity** as an OFDM system. Zervos and Kalet (Zervos, 1989) have also proven that for an unconstrained length ZF DFE and high SNRs, OFDM and SC FD-DFE have the same capacity. More detail for equalization for SC systems can be refered to the equalization documentation.
+
+In fact, SC and OFDM modems can easily be configured to **coexist**, and **significant advantages** may be obtained through such coexistence.
+
+### 2.1.2. OFDM vs. Single-Carrier
+
+It has already been shown that when channel loading (adaptive modulation on each subcarrier of OFDM) is performed, the OFDM exhibits a sharp increase of performance over FD-LE (Czylwik, 1007).
+
+# 3. OFDM History and Introduction
 
 In the mid 60s, the concept of using parallel data transmission and frequency division multiplexing (FDM) was published, where overlapping subchannels are used to **avoid the high speed equalization in the time domain**. The inital applications were in military communications. Later, it was applied in telecommunication field, where the discrete multi-tone (DMT) and the multicarrier modulation (MCM) are standarized.
 
+## 3.1. Disadvantage of OFDM
+
+- High peak-to-average power ratio;
+- Sensitive to carrier frequency offset and phase noise.
+
 **<to do>**
+
+## 3.2. From Time Domain To Frequency Domain: Linear And Circular Convolution
+
+The multi-carrier system considers usually an equivalent frequency-domain transmission model. Since the signal in the frequency domain equalization is formed on blocks by DFT, the equivalence between the **time-domain convolution** and the **frequency-domain multiplication** holds **only if** the **transmitted signal** forces the **linear convolution** with the channel impulse response to be **circular** (Benvenuto, 2002):
+
+$$s_n=s_{n+P},\quad n=0,1,\cdots,L-1.$$
+
+This is a $P$-size DFT.
+
+```Matlab
+% Example: Linear and Circular Convolution
+s = [1,2,3]; % assume to be the signal
+h = [1,1,1]; % assume to be the channel
+
+% DFT and IDFT not invertible with linear convolution <=> alising
+rLin = conv(s,h); % linear convolution [1,3,6,5,3]
+rDft = ifft(fft(s).*fft(h)); % [6,6,6]
+
+% DFT <=> circular convolution
+rCir4  = cconv(s,h,4); % circular convolution [4,3,6,5]
+rDftC4 = ifft(fft(s,4).*fft(h,4)); % [4,3,6,5],
+rCir5  = cconv(s,h,5); % circular convolution [1,3,6,5,3]
+rDftC5 = ifft(fft(s,5).*fft(h,5)); % [1,3,6,5,3]
+rCir6  = cconv(s,h,6); % circular convolution [1,3,6,5,3,0]
+yDftC6 = ifft(fft(s,6).*fft(h,6)); % [1,3,6,5,3,0]
+
+% from linear convolution to circular convolution
+% method 1: add cyclic prefix
+%  equivlently add zero to avoid aliasing
+s2 = [2,3,1,2,3]; % cyclic prefix with length 2
+h2 = [1,1,1]; % assume to be the channel
+r2 = conv(s2,h2); % [2,5,6,6,6,5,3]
+r2 = r2(1:5); % linear convolution: output same length as input
+r2Final = r2(3:end); % discard cyclic prefix [6,6,6] = ifft(fft(s).*fft(h))
+
+%  method 2: equivlently add zero to avoid aliasing
+s2 = [1,2,3,0,0,0]; % assume to be the signal
+h2 = [1,1,1,0,0,0]; % assume to be the channel
+rDft2 = ifft(fft(s2).*fft(h2)); % [1,3,6,5,3,0]
+```
+
+There are many methods to force the convolution of the sent data $\left\{s_n\right\}$ with the transmission channel $\left\{h_l\right\}$:
+
+- Cyclic extension (cyclic prefix);
+- PN extension.
 
 # 4. OFDM System 
 
@@ -270,6 +330,17 @@ Based on the CP-OFDM, a subband filter is added at each subcarrier. F-OFDM is us
 - OFDM waveform is not flexible in terms of subcarrier spacing and CP,
 - OFDM waveform cannot support asynchronous operation, which means timming adjustment is needed.
 
+## 10.5. DFT-Spread OFDM (DFTS-OFDM) [LTE]
+
+DFTS-OFDM, depicted in the following image, is used for **uplink transmission** in the **LTE** standard (Dahlman, 2014). This scheme is also called **single-carrier frequency domain multiplex access (SC-FDMA)**.
+
+<img src='./images/DFTS-OFDM-block-diagram-tx.png' alt='DFTS-OFDM block diagram'/>
+<img src='./images/DFTS-OFDM-block-diagram-rx.png' alt='DFTS-OFDM block diagram'/>
+
+(Figure: OFTS-OFDM block diagram.)
+
+
+
 # 11. Fast Programing for DFT
 
 The $N$-point DFT is
@@ -292,12 +363,17 @@ Relative to FFT, the WFT algorithm significantly reduces the number of multiplic
 
 # 12. References
 
+- Benvenuto, N. & Tomasin, S. (2002). On the comparison between OFDM and single carrier modulation with a DFE using a frequency-domain feedforward filter. *IEEE Transactions on Communications*, vol. 50, no. 6.
 - Cho, Y. S., Kim, J., Yang, W. Y., & Kang, C. G. (2010). MIMO-OFDM wireless communications with MATLAB. Singapore, Singapore: John Wiley & Sons (Asia) Pte.
 - Cooley, J. W., & Tukey, J. W. (1965). An algorithm for the machine calculation of complex Fourier series. *Mathematics of Computation*, 19:297-301.
+- Czylwik, A., (1997). Comparison between adaptive OFDM and single carrier modulation with frequency domain equalization. *Proc. VTC'97, vol.2.* Phoenix, AZ, pp. 865-869.
 - Falconer, D. & Ariyavisitakul, S. L. & Benyamin-Seeyar, A. & Eidson, B. (2002). Frequency domain equalization for single-carrier broadband wireless systems. *IEEE Communications Magazin*.
 - McDonnell, J. T. E. & Wilkinson, T. A. (1996). Comparison of computational complexity of adaptive equalization and OFDm for indoor wireless networks. *Proc. PIMRC'96*, Taipei, Taiwan, pp. 1088-90.
 - Pauli, M., & Kuchenbecker, P. (1998). On the reduction of the out-of-band radiation of OFDM-signals. 1998 IEEE International Conference on Communications.
 - Prasad, R. (2004). OFDM for wireless communications systems. Boston: Artech House.
+- Sari, H. & Karam, G. & Jeanclaude, I. (1994). Frequency-domain equalization of mobile radio and terrestrial broadcast channels. *Proc. GLOBECOM '94*, San Francisco, CA. Nov.-Dec. 1994, pp.1-5.
+- Sari, H. & Karam, G. & Jeanclaude, I. (1995). Transmission techniques for digital terrestrial TV braodcasting. *IEEE Commun. Mag.*, vol.33, no.2, Feb. 1995, pp. 100-109.
+- Zervos, N. A. & Kalet, I. (1989). Optimized decision feedback equalization versus optimized orthogonal frequency division multiplexing for high-speed data transmission over the local cable network. *Proc. ICC'89.* Boston, MA, USA. pp. 1080-1085.
 - Zou, W. Y., & Wu Y. (1995). COFDM: an overview. IEEE Transactions on Broadcasting, vol. 41, no. 1.
 
 # 13. Appendix
